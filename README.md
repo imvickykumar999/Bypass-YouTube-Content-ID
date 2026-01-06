@@ -180,7 +180,8 @@ This creates seamless long-duration playback suitable for livestreams or backgro
 
 ## 🧠 Best-Practice Guidelines
 
-✔ Use **only original, licensed, or royalty-free audio**
-✔ Keep transformations subtle for quality
-✔ Always export a **new master file**
-✔ Maintain documentation of licenses if publishing
+- Use **only original, licensed, or royalty-free audio**
+- Keep transformations subtle for quality
+- Always export a **new master file**
+- Maintain documentation of licenses if publishing
+
