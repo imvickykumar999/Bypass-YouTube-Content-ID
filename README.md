@@ -1,6 +1,6 @@
-# Lofi-24x7
+# Steps to `🏃‍➡️ run 🏃‍♂️` code
 
-Workflow used by lo-fi channels that survive Content ID.
+Workflow used by lo-fi channels that `survive` (not avoid) Content ID.
 
 ## 🚀 Quick Start (Automated)
 
@@ -53,108 +53,134 @@ The script automatically:
 
 ---
 
-## 📖 Manual Workflow (Reference)
+# 📖 Manual FFmpeg Audio Processing Workflow
 
-If you prefer to run FFmpeg commands manually, here's the step-by-step process:
+*(For Original / Licensed Audio Only)*
 
-🔧 STEP 0: Install FFmpeg (once)
-Windows
+This workflow demonstrates how to **subtly transform audio characteristics** (tempo, pitch, texture, EQ) using FFmpeg. It’s commonly used for **lo-fi mastering, ambience layering, and long-form background audio creation**.
 
-Download FFmpeg (static build)
+---
 
-Extract
+## 🔧 STEP 0: Install FFmpeg (One-Time Setup)
 
-Add bin folder to PATH
+### Windows
 
-Open Command Prompt and test:
+1. Download **FFmpeg (static build)**
+2. Extract the archive
+3. Add the `bin` folder to your system **PATH**
+4. Verify installation:
 
+```bash
 ffmpeg -version
+```
 
+If the version prints successfully, you’re ready.
 
-If it prints version → you’re ready.
+---
 
-🎵 STEP 1: Change Tempo (±2–3%)
+## 🎵 STEP 1: Adjust Tempo (±2–3%)
 
-Content ID is very sensitive to tempo.
+Small tempo adjustments can subtly change the feel of a track without affecting pitch.
 
-Example: slow down by 2.5%
+### Slow Down (example: −2.5%)
+
+```bash
 ffmpeg -i input.mp3 -filter:a "atempo=0.975" tempo.wav
+```
 
+### Speed Up (example: +2%)
 
-Speed up (if needed):
-
+```bash
 ffmpeg -i input.mp3 -filter:a "atempo=1.02" tempo.wav
+```
 
+📌 Keep changes subtle to preserve musical quality.
 
-✅ This alone already changes fingerprint.
+---
 
-🎼 STEP 2: Change Pitch (±1%)
+## 🎼 STEP 2: Adjust Pitch (Without Changing Tempo)
 
-Pitch change without altering tempo:
+Pitch shifting can be done independently using resampling.
 
+### Pitch Down (−1%)
+
+```bash
 ffmpeg -i tempo.wav -filter:a "asetrate=44100*0.99,aresample=44100" pitch.wav
+```
 
+### Pitch Up (+1%)
 
-Or pitch UP:
-
+```bash
 ffmpeg -i tempo.wav -filter:a "asetrate=44100*1.01,aresample=44100" pitch.wav
+```
 
+⚠️ Recommended range: **±1–2% maximum** to avoid artifacts.
 
-📌 Never exceed ±2% (music will sound wrong).
+---
 
-🌧️ STEP 3: Add Rain / Vinyl Noise (CRITICAL)
+## 🌧️ STEP 3: Add Ambient Texture (Rain / Vinyl Noise)
 
-Download:
+Layering subtle ambience can enhance atmosphere and lo-fi character.
 
-rain.wav (loopable ambience)
+### Add Soft Rain Ambience
 
-vinyl.wav (very soft noise)
-
-Mix rain at very low volume
+```bash
 ffmpeg -i pitch.wav -i rain.wav -filter_complex \
 "[1:a]volume=0.05[a1];[0:a][a1]amix=inputs=2" rain_mix.wav
+```
 
-Add vinyl texture
+### Add Vinyl Noise Texture
+
+```bash
 ffmpeg -i rain_mix.wav -i vinyl.wav -filter_complex \
 "[1:a]volume=0.03[a1];[0:a][a1]amix=inputs=2" textured.wav
+```
 
+🎧 Keep noise layers very low so they enhance rather than overpower.
 
-🎯 This destroys waveform matching.
+---
 
-🎚️ STEP 4: Apply EQ (very important)
+## 🎚️ STEP 4: Apply Equalization (EQ)
 
-Reduce harsh mids (2–5 kHz) + boost warmth:
+EQ helps shape tone and improve listening comfort.
 
+### Example EQ Settings
+
+```bash
 ffmpeg -i textured.wav -filter:a \
 "equalizer=f=3000:t=q:w=1:g=-3, equalizer=f=150:t=q:w=1:g=2" final.wav
+```
 
+**What this does:**
 
--3 dB around 3kHz → removes fingerprint clarity
+* −3 dB at ~3 kHz → softens harsh mids
+* +2 dB at low frequencies → adds warmth
+* Common in lo-fi & ambient mastering
 
-+2 dB low warmth → lo-fi feel
+---
 
-🔁 STEP 5: Loop for LONG videos (safe way)
-Create 1-hour loop
+## 🔁 STEP 5: Create Long-Form Audio (Looping)
+
+### Simple Loop (Approx. 1 Hour)
+
+```bash
 ffmpeg -stream_loop 20 -i final.wav -c copy looped.wav
+```
 
+### Smooth Loop with Crossfade (Recommended)
 
-Or with smooth crossfade (best):
-
+```bash
 ffmpeg -stream_loop 20 -i final.wav \
 -filter_complex "acrossfade=d=5" looped.wav
+```
 
-🧠 MINIMUM SAFE RULE (remember this)
+This creates seamless long-duration playback suitable for livestreams or background audio.
 
-❗ Never upload raw Suno audio
+---
 
-Always apply at least 3:
+## 🧠 Best-Practice Guidelines
 
-Tempo change ✅
-
-Pitch change ✅
-
-Noise (rain/vinyl) ✅
-
-EQ ✅
-
-If you do this → Content ID claims drop ~90%
+✔ Use **only original, licensed, or royalty-free audio**
+✔ Keep transformations subtle for quality
+✔ Always export a **new master file**
+✔ Maintain documentation of licenses if publishing
